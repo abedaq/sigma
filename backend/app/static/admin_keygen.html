@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة توليد التراخيص والمفاتيح - SIGMA ASR VTT</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    body {
+      background-color: #090E1A;
+      color: #E2E8F0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 16px;
+    }
+    .container {
+      width: 100%;
+      max-width: 680px;
+      background: #0F172A;
+      border: 1px solid #1E293B;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(59, 130, 246, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+      padding: 24px;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #2563EB, #1D4ED8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+    .header-text h1 {
+      font-size: 20px;
+      color: #F8FAFC;
+      margin-bottom: 4px;
+    }
+    .header-text p {
+      font-size: 13px;
+      color: #94A3B8;
+    }
+    .card-body {
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #CBD5E1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .input-text, .select-box {
+      width: 100%;
+      background: #090E1A;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 11px 14px;
+      color: #F8FAFC;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-text:focus, .select-box:focus {
+      border-color: #3B82F6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    .input-mono {
+      font-family: 'Courier New', Courier, monospace;
+      direction: ltr;
+      text-align: center;
+      font-weight: 700;
+      color: #38BDF8;
+    }
+    .hwid-row {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-secondary {
+      background: #1E293B;
+      color: #93C5FD;
+      border: 1px solid #3B82F6;
+      border-radius: 8px;
+      padding: 0 16px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      background: #2563EB;
+      color: #FFFFFF;
+    }
+    .radio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .radio-card {
+      background: #090E1A;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .radio-card.active {
+      background: rgba(37, 99, 235, 0.15);
+      border-color: #3B82F6;
+      color: #60A5FA;
+      font-weight: 700;
+    }
+    .btn-generate {
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      margin-top: 6px;
+    }
+    .btn-generate:hover {
+      background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+    }
+    .result-section {
+      margin-top: 8px;
+      background: #090E1A;
+      border: 1px solid #10B981;
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      animation: slideDown 0.25s ease-out;
+    }
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #34D399;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .token-box {
+      width: 100%;
+      background: #030712;
+      border: 1px solid #1F2937;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #E2E8F0;
+      direction: ltr;
+      word-break: break-all;
+      user-select: all;
+    }
+    .actions-row {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-action {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-copy-token {
+      background: #1E293B;
+      color: #F8FAFC;
+      border: 1px solid #475569;
+    }
+    .btn-copy-token:hover {
+      background: #334155;
+      border-color: #64748B;
+    }
+    .btn-copy-msg {
+      background: #059669;
+      color: #FFFFFF;
+    }
+    .btn-copy-msg:hover {
+      background: #10B981;
+    }
+    .links-footer {
+      margin-top: 24px;
+      text-align: center;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    .links-footer a {
+      color: #60A5FA;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .links-footer a:hover {
+      text-decoration: underline;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-icon">🔑</div>
+      <div class="header-text">
+        <h1>لوحة تحكم توليد التراخيص والمفاتيح</h1>
+        <p>SIGMA ASR VTT — تشفير وتوقيع المفاتيح الرقمية (Ed25519)</p>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body">
+      <!-- 1. Client Name -->
+      <div class="form-group">
+        <label class="form-label">👤 اسم العميل أو المشتري:</label>
+        <input type="text" id="clientName" class="input-text" placeholder="مثال: أصيل السويدي" value="أصيل السويدي">
+      </div>
+
+      <!-- 2. HWID -->
+      <div class="form-group">
+        <label class="form-label">🖥️ بصمة جهاز العميل (Hardware ID):</label>
+        <div class="hwid-row">
+          <input type="text" id="hwid" class="input-text input-mono" placeholder="SIGMA-XXXX-XXXX-XXXX-XXXX">
+          <button class="btn-secondary" onclick="autoFillCurrentHWID()">بصمة هذا الجهاز 📍</button>
+        </div>
+      </div>
+
+      <!-- 3. Duration Type -->
+      <div class="form-group">
+        <label class="form-label">⏱️ صلاحية ونوع الترخيص:</label>
+        <div class="radio-grid">
+          <div class="radio-card active" onclick="selectDuration('lifetime', this)">
+            <div>♾️</div>
+            <div>مدى الحياة (Lifetime)</div>
+          </div>
+          <div class="radio-card" onclick="selectDuration('hours', this)">
+            <div>⏳</div>
+            <div>بالساعات (Hours)</div>
+          </div>
+          <div class="radio-card" onclick="selectDuration('days', this)">
+            <div>📅</div>
+            <div>بالأيام (Days)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Duration Value (Hours/Days) -->
+      <div class="form-group" id="durationValueGroup" style="display: none;">
+        <label class="form-label" id="durationLabel">المدة المطلوبة:</label>
+        <input type="number" id="durationInput" class="input-text" placeholder="مثال: 24" value="24" min="1">
+      </div>
+
+      <!-- 5. Plan -->
+      <div class="form-group">
+        <label class="form-label">⭐ باقة الترخيص:</label>
+        <select id="plan" class="select-box">
+          <option value="PRO">SIGMA PRO (الاحترافية)</option>
+          <option value="VIP">SIGMA VIP</option>
+          <option value="ENTERPRISE">SIGMA ENTERPRISE</option>
+        </select>
+      </div>
+
+      <!-- Generate Button -->
+      <button class="btn-generate" onclick="handleGenerateKey()">
+        <span>⚡</span>
+        <span>توليد وتشفير كود الترخيص الآن</span>
+      </button>
+
+      <!-- Results Box -->
+      <div id="resultBox" class="result-section" style="display: none;">
+        <div class="result-header">
+          <span>✅ تم إنشاء وتوقيع كود الترخيص بنجاح!</span>
+          <span id="badgeExpiry" style="font-size: 11px; background: #064E3B; padding: 2px 8px; border-radius: 4px;">مدى الحياة</span>
+        </div>
+
+        <div class="token-box" id="tokenOutput"></div>
+
+        <div class="actions-row">
+          <button class="btn-action btn-copy-token" id="btnCopyToken" onclick="copyToken()">
+            <span>📋</span>
+            <span id="copyTokenText">نسخ المفتاح فقط</span>
+          </button>
+          <button class="btn-action btn-copy-msg" id="btnCopyMsg" onclick="copyClientMessage()">
+            <span>💬</span>
+            <span id="copyMsgText">نسخ رسالة جاهزة للعميل (واتساب/تلجرام)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="links-footer">
+    <a href="http://localhost:3000" target="_blank">🎬 فتح واجهة البرنامج الرئيسية (المعالجة والترخيص)</a>
+    <span style="color: #475569;">•</span>
+    <button onclick="handleResetLicense()" style="background: none; border: none; color: #F87171; cursor: pointer; font-size: 13px; font-weight: 600;">🔄 إلغاء التفعيل الحالي لتجربة القفل</button>
+    <span style="color: #475569;">•</span>
+    <a href="http://localhost:8000/docs" target="_blank">📚 Swagger API Docs</a>
+  </div>
+
+  <script>
+    let currentDurationType = 'lifetime';
+    let generatedToken = '';
+    let lastPayload = null;
+
+    async function handleResetLicense() {
+      if (!confirm('هل تريد إلغاء التفعيل الحالي وحذف الترخيص من جهازك لإعادة ظهور شاشة القفل وتجربتها؟')) return;
+      try {
+        const res = await fetch('/api/v1/license/reset', { method: 'POST' });
+        const data = await res.json();
+        alert(data.message || 'تم حذف الترخيص بنجاح! قم بتحديث صفحة البرنامج (http://localhost:3000) لتظهر لك شاشة القفل فوراً.');
+      } catch (err) {
+        alert('فشل إعادة تعيين الترخيص: ' + err.message);
+      }
+    }
+
+    function selectDuration(type, el) {
+      currentDurationType = type;
+      document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+
+      const valGroup = document.getElementById('durationValueGroup');
+      const label = document.getElementById('durationLabel');
+      const input = document.getElementById('durationInput');
+
+      if (type === 'lifetime') {
+        valGroup.style.display = 'none';
+      } else if (type === 'hours') {
+        valGroup.style.display = 'flex';
+        label.innerText = 'عدد الساعات المسموح بها:';
+        input.value = '48';
+      } else if (type === 'days') {
+        valGroup.style.display = 'flex';
+        label.innerText = 'عدد الأيام المسموح بها:';
+        input.value = '30';
+      }
+    }
+
+    async function autoFillCurrentHWID() {
+      try {
+        const res = await fetch('/api/v1/license/hwid');
+        const data = await res.json();
+        if (data.hwid) {
+          document.getElementById('hwid').value = data.hwid;
+        }
+      } catch (err) {
+        alert('تعذر جلب بصمة الجهاز تلقائياً، تأكد من تشغيل السيرفر.');
+      }
+    }
+
+    async function handleGenerateKey() {
+      const clientName = document.getElementById('clientName').value.trim() || 'العميل المعتمد';
+      const hwid = document.getElementById('hwid').value.trim();
+      const plan = document.getElementById('plan').value;
+
+      if (!hwid) {
+        alert('يرجى إدخال بصمة الجهاز (HWID) أولاً.');
+        return;
+      }
+
+      const body = {
+        hwid: hwid,
+        client_name: clientName,
+        license_type: currentDurationType === 'lifetime' ? 'lifetime' : 'time_limited',
+        plan: plan
+      };
+
+      if (currentDurationType === 'hours') {
+        body.hours = parseFloat(document.getElementById('durationInput').value) || 24;
+      } else if (currentDurationType === 'days') {
+        body.days = parseFloat(document.getElementById('durationInput').value) || 30;
+      }
+
+      try {
+        const res = await fetch('/api/v1/license/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+        if (data.status === 'success') {
+          generatedToken = data.token;
+          lastPayload = data.payload;
+
+          document.getElementById('tokenOutput').innerText = generatedToken;
+          document.getElementById('resultBox').style.display = 'flex';
+
+          const badge = document.getElementById('badgeExpiry');
+          if (data.payload.expires_at === 0) {
+            badge.innerText = 'مدى الحياة (Lifetime)';
+          } else {
+            const expDate = new Date(data.payload.expires_at * 1000);
+            badge.innerText = 'ينتهي: ' + expDate.toLocaleString('en-US');
+          }
+        } else {
+          alert('خطأ أثناء التوليد: ' + (data.detail || data.message));
+        }
+      } catch (err) {
+        alert('فشل الاتصال بخادم التوليد: ' + err.message);
+      }
+    }
+
+    async function copyToken() {
+      if (!generatedToken) return;
+      await navigator.clipboard.writeText(generatedToken);
+      const textSpan = document.getElementById('copyTokenText');
+      textSpan.innerText = '✅ تم النسخ!';
+      setTimeout(() => { textSpan.innerText = 'نسخ المفتاح فقط'; }, 2000);
+    }
+
+    async function copyClientMessage() {
+      if (!generatedToken || !lastPayload) return;
+      const client = lastPayload.client_name || 'عميلنا العزيز';
+      const hwid = lastPayload.device_id || '';
+      let expiryTxt = 'دائم مدى الحياة';
+      if (lastPayload.expires_at > 0) {
+        expiryTxt = new Date(lastPayload.expires_at * 1000).toLocaleString('en-US');
+      }
+
+      const msg = `مرحباً ${client}،\nتم تفعيل وتوثيق ترخيص برنامج SIGMA VTT لجهازك بنجاح.\n\nبصمة جهازك: ${hwid}\nالصلاحية: ${expiryTxt}\nباقة: ${lastPayload.plan}\n\nكود المفتاح الخاص بك (انسخه كاملاً والصقه في البرنامج):\n${generatedToken}\n\nنتمنى لك تجربة ممتعة!`;
+
+      await navigator.clipboard.writeText(msg);
+      const textSpan = document.getElementById('copyMsgText');
+      textSpan.innerText = '✅ تم نسخ الرسالة الجاهزة!';
+      setTimeout(() => { textSpan.innerText = 'نسخ رسالة جاهزة للعميل (واتساب/تلجرام)'; }, 2500);
+    }
+
+    // Auto load HWID on page open
+    window.addEventListener('DOMContentLoaded', () => {
+      autoFillCurrentHWID();
+    });
+  </script>
+</body>
+</html>

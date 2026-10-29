@@ -1,0 +1,46 @@
+# Python & Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.env.*
+*.env
+.venv/
+venv/
+env/
+
+# License & Cryptographic Keys (Must NEVER be distributed to clients!)
+*.pem
+*.key
+backend/keys/
+backend/license.dat
+license.dat
+license.enc
+
+# Build and Distribution Artifacts
+build/
+dist/
+dist-ssr/
+*.spec
+*.exe
+
+# Node / Vite
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Logs and temp
+backend/logs/
+backend/temp/
+backend/outputs/
+scratch/
+build.log
+
+# Archives, DBs & Large Binaries
+*.rar
+*.zip
+*.7z
+*.tar.gz
+*.db
+*.sqlite3
